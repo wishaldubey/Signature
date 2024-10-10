@@ -37,35 +37,32 @@ const Canvas = () => {
     return { x, y };
   };
 
-  
- const startDrawing = (event) => {
-  event.preventDefault(); // Prevent default touch behavior
-  const { x, y } = getPosition(event);
-  ctxRef.current.beginPath();
-  ctxRef.current.moveTo(x, y);
-  setIsDrawing(true);
-};
+  const startDrawing = (event) => {
+    event.preventDefault(); // Prevent default touch behavior
+    const { x, y } = getPosition(event);
+    ctxRef.current.beginPath();
+    ctxRef.current.moveTo(x, y);
+    setIsDrawing(true);
+  };
 
-const finishDrawing = (event) => {
-  event.preventDefault(); // Prevent default touch behavior
-  if (!isDrawing) return;
-  ctxRef.current.closePath();
-  setIsDrawing(false);
-  const canvas = canvasRef.current;
-  const newHistory = history.slice(0, historyStep);
-  newHistory.push(canvas.toDataURL());
-  setHistory(newHistory);
-  setHistoryStep(newHistory.length);
-};
+  const finishDrawing = () => {
+    if (!isDrawing) return;
+    ctxRef.current.closePath();
+    setIsDrawing(false);
+    const canvas = canvasRef.current;
+    const newHistory = history.slice(0, historyStep);
+    newHistory.push(canvas.toDataURL());
+    setHistory(newHistory);
+    setHistoryStep(newHistory.length);
+  };
 
-const draw = (event) => {
-  event.preventDefault(); // Prevent default touch behavior
-  if (!isDrawing) return;
-  const { x, y } = getPosition(event);
-  ctxRef.current.lineTo(x, y);
-  ctxRef.current.stroke();
-};
-
+  const draw = (event) => {
+    event.preventDefault(); // Prevent default touch behavior
+    if (!isDrawing) return;
+    const { x, y } = getPosition(event);
+    ctxRef.current.lineTo(x, y);
+    ctxRef.current.stroke();
+  };
 
   const changeColor = (newColor) => {
     setColor(newColor);
@@ -138,14 +135,14 @@ const draw = (event) => {
         onTouchStart={startDrawing}
         onTouchEnd={finishDrawing}
         onTouchMove={draw}
-        className="border bg-white rounded-lg shadow-md transition-all duration-300 ease-in-out "
+        className="border bg-white rounded-lg shadow-md transition-all duration-300 ease-in-out"
       />
       <div className="flex flex-wrap justify-center space-x-2 space-y-2">
         <input
           type="color"
           value={color}
           onChange={(e) => changeColor(e.target.value)}
-          className="w-10 h-10 cursor-pointer  shadow-md transition-colors duration-300 ease-in-out border border-gray-300"
+          className="w-10 h-10 cursor-pointer shadow-md transition-colors duration-300 ease-in-out border border-gray-300"
           title="Select Color"
         />
         <div className="flex items-center">
@@ -189,12 +186,11 @@ const draw = (event) => {
           }`}
         >
           <FaPencilAlt className="mr-1" />
-          
         </button>
         <button
           onClick={() => { erase(); setIsErasing(true); }}
           className={`flex items-center px-4 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-110 ${
-            isErasing ? "bg-yellow-500 text-black border border-yellow-600" : "bg-gray-600 text-gray-200 hover:bg-purple-600 "
+            isErasing ? "bg-yellow-500 text-black border border-yellow-600" : "bg-gray-600 text-gray-200 hover:bg-purple-600"
           }`}
         >
           <FaEraser className="mr-1" />
@@ -204,21 +200,18 @@ const draw = (event) => {
           className="flex items-center bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-105"
         >
           <FaUndo className="mr-1" />
-          
         </button>
         <button
           onClick={redo}
           className="flex items-center bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-110"
         >
           <FaRedo className="mr-1" />
-          
         </button>
         <button
           onClick={clearCanvas}
           className="flex items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-110"
         >
           <FaTrash className="mr-1" />
-          
         </button>
         <button
           onClick={exportPNG}
