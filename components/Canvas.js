@@ -37,30 +37,35 @@ const Canvas = () => {
     return { x, y };
   };
 
-  const startDrawing = (event) => {
-    const { x, y } = getPosition(event);
-    ctxRef.current.beginPath();
-    ctxRef.current.moveTo(x, y);
-    setIsDrawing(true);
-  };
+  
+ const startDrawing = (event) => {
+  event.preventDefault(); // Prevent default touch behavior
+  const { x, y } = getPosition(event);
+  ctxRef.current.beginPath();
+  ctxRef.current.moveTo(x, y);
+  setIsDrawing(true);
+};
 
-  const finishDrawing = () => {
-    if (!isDrawing) return;
-    ctxRef.current.closePath();
-    setIsDrawing(false);
-    const canvas = canvasRef.current;
-    const newHistory = history.slice(0, historyStep);
-    newHistory.push(canvas.toDataURL());
-    setHistory(newHistory);
-    setHistoryStep(newHistory.length);
-  };
+const finishDrawing = (event) => {
+  event.preventDefault(); // Prevent default touch behavior
+  if (!isDrawing) return;
+  ctxRef.current.closePath();
+  setIsDrawing(false);
+  const canvas = canvasRef.current;
+  const newHistory = history.slice(0, historyStep);
+  newHistory.push(canvas.toDataURL());
+  setHistory(newHistory);
+  setHistoryStep(newHistory.length);
+};
 
-  const draw = (event) => {
-    if (!isDrawing) return;
-    const { x, y } = getPosition(event);
-    ctxRef.current.lineTo(x, y);
-    ctxRef.current.stroke();
-  };
+const draw = (event) => {
+  event.preventDefault(); // Prevent default touch behavior
+  if (!isDrawing) return;
+  const { x, y } = getPosition(event);
+  ctxRef.current.lineTo(x, y);
+  ctxRef.current.stroke();
+};
+
 
   const changeColor = (newColor) => {
     setColor(newColor);
