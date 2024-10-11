@@ -29,14 +29,6 @@ const Canvas = () => {
     ctxRef.current = ctx;
   };
 
-  const disableScroll = () => {
-    document.body.style.overflow = 'hidden';
-  };
-
-  const enableScroll = () => {
-    document.body.style.overflow = 'auto';
-  };
-
   const getPosition = (event) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -46,28 +38,30 @@ const Canvas = () => {
   };
 
   const startDrawing = (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent default touch behavior
     const { x, y } = getPosition(event);
     ctxRef.current.beginPath();
     ctxRef.current.moveTo(x, y);
     setIsDrawing(true);
-    disableScroll();  // Disable scrolling when starting to draw
+    // Disable scrolling
+    document.body.style.overflow = 'hidden';
   };
 
   const finishDrawing = () => {
     if (!isDrawing) return;
     ctxRef.current.closePath();
     setIsDrawing(false);
-    enableScroll();  // Re-enable scrolling when finished drawing
     const canvas = canvasRef.current;
     const newHistory = history.slice(0, historyStep);
     newHistory.push(canvas.toDataURL());
     setHistory(newHistory);
     setHistoryStep(newHistory.length);
+    // Re-enable scrolling
+    document.body.style.overflow = 'auto';
   };
 
   const draw = (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent default touch behavior
     if (!isDrawing) return;
     const { x, y } = getPosition(event);
     ctxRef.current.lineTo(x, y);
@@ -115,8 +109,8 @@ const Canvas = () => {
 
   const clearCanvas = () => {
     ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    setHistory([]); 
-    setHistoryStep(0); 
+    setHistory([]);
+    setHistoryStep(0);
   };
 
   const exportPNG = () => {
@@ -129,9 +123,27 @@ const Canvas = () => {
 
   const exportJPEG = () => {
     const canvas = canvasRef.current;
+    const ctx = ctxRef.current;
+
+    // Create a temporary canvas to draw the image with a white background
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    // Set the same width and height as the original canvas
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    
+    // Fill the temp canvas with white background
+    tempCtx.fillStyle = '#FFFFFF';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Draw the original canvas on top of the white background
+    tempCtx.drawImage(canvas, 0, 0);
+
+    // Export the image as JPEG
     const link = document.createElement('a');
     link.download = 'drawing.jpg';
-    link.href = canvas.toDataURL('image/jpeg');
+    link.href = tempCanvas.toDataURL('image/jpeg');
     link.click();
   };
 
