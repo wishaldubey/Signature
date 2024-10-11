@@ -29,6 +29,14 @@ const Canvas = () => {
     ctxRef.current = ctx;
   };
 
+  const disableScroll = () => {
+    document.body.style.overflow = 'hidden';
+  };
+
+  const enableScroll = () => {
+    document.body.style.overflow = 'auto';
+  };
+
   const getPosition = (event) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
@@ -43,12 +51,14 @@ const Canvas = () => {
     ctxRef.current.beginPath();
     ctxRef.current.moveTo(x, y);
     setIsDrawing(true);
+    disableScroll();  // Disable scrolling when starting to draw
   };
 
   const finishDrawing = () => {
     if (!isDrawing) return;
     ctxRef.current.closePath();
     setIsDrawing(false);
+    enableScroll();  // Re-enable scrolling when finished drawing
     const canvas = canvasRef.current;
     const newHistory = history.slice(0, historyStep);
     newHistory.push(canvas.toDataURL());
