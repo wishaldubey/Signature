@@ -27,14 +27,6 @@ const Canvas = () => {
     ctx.strokeStyle = color;
     ctx.lineWidth = pencilSize;
     ctxRef.current = ctx;
-
-    // Prevent scrolling while drawing
-    canvas.addEventListener('touchstart', preventScroll, { passive: false });
-    canvas.addEventListener('touchmove', preventScroll, { passive: false });
-  };
-
-  const preventScroll = (event) => {
-    event.preventDefault();
   };
 
   const getPosition = (event) => {
@@ -46,7 +38,7 @@ const Canvas = () => {
   };
 
   const startDrawing = (event) => {
-    event.preventDefault(); // Prevent default touch behavior
+    event.preventDefault();
     const { x, y } = getPosition(event);
     ctxRef.current.beginPath();
     ctxRef.current.moveTo(x, y);
@@ -65,7 +57,7 @@ const Canvas = () => {
   };
 
   const draw = (event) => {
-    event.preventDefault(); // Prevent default touch behavior
+    event.preventDefault();
     if (!isDrawing) return;
     const { x, y } = getPosition(event);
     ctxRef.current.lineTo(x, y);
@@ -146,7 +138,93 @@ const Canvas = () => {
         className="border bg-white rounded-lg shadow-md transition-all duration-300 ease-in-out"
       />
       <div className="flex flex-wrap justify-center space-x-2 space-y-2">
-        {/* Other UI elements like color picker, undo, redo, export buttons */}
+        <input
+          type="color"
+          value={color}
+          onChange={(e) => changeColor(e.target.value)}
+          className="w-10 h-10 cursor-pointer shadow-md transition-colors duration-300 ease-in-out border border-gray-300"
+          title="Select Color"
+        />
+        <div className="flex items-center">
+          <label htmlFor="pencilSize" className="mr-2 text-sm">Pencil Size: {pencilSize}</label>
+          <input
+            id="pencilSize"
+            type="range"
+            min="1"
+            max="50"
+            value={pencilSize}
+            onChange={(e) => {
+              setPencilSize(e.target.value);
+              if (!isErasing) {
+                ctxRef.current.lineWidth = e.target.value;
+              }
+            }}
+            className="w-32 accent-blue-600"
+          />
+        </div>
+        <div className="flex items-center">
+          <label htmlFor="eraserSize" className="mr-2 text-sm">Eraser Size: {eraserSize}</label>
+          <input
+            id="eraserSize"
+            type="range"
+            min="1"
+            max="50"
+            value={eraserSize}
+            onChange={(e) => {
+              setEraserSize(e.target.value);
+              if (isErasing) {
+                ctxRef.current.lineWidth = e.target.value;
+              }
+            }}
+            className="w-32 accent-red-600"
+          />
+        </div>
+        <button
+          onClick={() => { normalDraw(); setIsErasing(false); }}
+          className={`flex items-center px-4 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-110  ${
+            !isErasing ? "bg-yellow-500 text-black border border-yellow-600" : "bg-gray-600 text-gray-200 hover:bg-purple-600"
+          }`}
+        >
+          <FaPencilAlt className="mr-1" />
+        </button>
+        <button
+          onClick={() => { erase(); setIsErasing(true); }}
+          className={`flex items-center px-4 py-2 rounded-lg transition duration-300 ease-in-out transform hover:scale-110 ${
+            isErasing ? "bg-yellow-500 text-black border border-yellow-600" : "bg-gray-600 text-gray-200 hover:bg-purple-600"
+          }`}
+        >
+          <FaEraser className="mr-1" />
+        </button>
+        <button
+          onClick={undo}
+          className="flex items-center bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-105"
+        >
+          <FaUndo className="mr-1" />
+        </button>
+        <button
+          onClick={redo}
+          className="flex items-center bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-110"
+        >
+          <FaRedo className="mr-1" />
+        </button>
+        <button
+          onClick={clearCanvas}
+          className="flex items-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-110"
+        >
+          <FaTrash className="mr-1" />
+        </button>
+        <button
+          onClick={exportPNG}
+          className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-110"
+        >
+          Export PNG
+        </button>
+        <button
+          onClick={exportJPEG}
+          className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-110"
+        >
+          Export JPEG
+        </button>
       </div>
     </div>
   );
